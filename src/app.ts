@@ -1,6 +1,6 @@
 import express from "express";
 import cors from 'cors';
-import config from "./config/index.js"; // Certifique-se que config.port não é mais necessário aqui
+import config from "./config/index.js"; 
 import { connectDB } from "./database/index.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 import authRouter from "./routes/auth.router.js";
@@ -20,8 +20,6 @@ app.use(errorMiddleware);
 
 logger.info("🔍 Tentando conectar ao MongoDB...");
 
-// 1. Use "Top-Level Await" para conectar
-// Isto pausa a inicialização até que o banco esteja pronto.
 try {
   await connectDB({
     serverSelectionTimeoutMS: 30000, 
@@ -31,13 +29,7 @@ try {
 
 } catch (error: any) {
   logger.error("❌ Falha ao conectar ao MongoDB:", error.message || error);
-  // Se o banco não conectar, falhamos o deploy
   process.exit(1); 
 }
 
-// 2. REMOVA a função startServer() e o app.listen()
-//    logger.info(`🚀 Servidor rodando na porta ${config.port}`) NÃO É NECESSÁRIO
-
-// 3. EXPORTE O 'APP' PRONTO
-// O Vercel vai pegar este 'app' e iniciar o servidor para você.
 export default app;

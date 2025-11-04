@@ -1,4 +1,4 @@
-import { TaskModel, ITask } from '../models/task.model';
+import { TaskModel, ITask } from '../models/task.model.js';
 import { FilterQuery } from 'mongoose';
 
 const mapTask = (task: any) => {

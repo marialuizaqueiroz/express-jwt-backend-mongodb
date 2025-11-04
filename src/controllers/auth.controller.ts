@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import * as userService from '../services/user.service';
+import * as userService from '../services/user.service.js';
 import jwt from 'jsonwebtoken';
-import config from '../config';
-import logger from '../utils/logger';
+import config from '../config/index.js';
+import logger from '../utils/logger.js';
 
 export const register = async (req: Request, res: Response) => {
   try {

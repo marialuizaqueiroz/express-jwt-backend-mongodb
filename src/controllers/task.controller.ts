@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import * as taskService from '../services/task.service';
-import logger from '../utils/logger';
+import * as taskService from '../services/task.service.js';
+import logger from '../utils/logger.js';
 
 
 interface UserPayload {
