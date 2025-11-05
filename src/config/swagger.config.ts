@@ -1,40 +1,49 @@
-import swaggerJsdoc from "swagger-jsdoc";
+import swaggerJSDoc from 'swagger-jsdoc';
+import path from 'path';
 
-const options = {
+// O 'path.resolve' garante que o caminho é absoluto a partir da raiz do projeto
+const apiPaths = [
+  path.resolve(process.cwd(), './src/routes/auth.router.ts'),
+  path.resolve(process.cwd(), './src/routes/task.router.ts'),
+];
+
+const options: swaggerJSDoc.Options = {
   definition: {
-    openapi: "3.0.0",
+    openapi: '3.0.0',
     info: {
-      title: "API CRUD de Tarefas",
-      version: "1.0.0",
-      description: "Documentação da API CRUD de Tarefas com autenticação JWT",
+      title: 'API - CRUD de Usuários e Tarefas',
+      version: '1.0.0',
+      description:
+        'Documentação da API com autenticação e tarefas. Projeto desenvolvido em Node.js + Express + TypeScript.',
     },
     servers: [
+      { url: 'http://localhost:3000/api', description: 'Servidor Local' },
       {
-        url: "https://express-jwt-backend.vercel.app",
-        description: "Servidor de produção",
-      },
-      {
-        url: "http://localhost:3000",
-        description: "Servidor local",
+        url: 'https://express-jwt-backend.vercel.app/api',
+        description: 'Servidor Produção (Vercel)',
       },
     ],
+    // A segurança (cadeado) é definida aqui
     components: {
       securitySchemes: {
         bearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'Token JWT de autenticação obtido no login',
         },
       },
     },
     security: [
       {
-        bearerAuth: [],
+        bearerAuth: [], // Aplica 'bearerAuth' globalmente a todas as rotas
       },
     ],
   },
-  // 👇 Isso é o mais importante: o caminho correto para rodar no Vercel!
-  apis: ["./dist/routes/*.js"],
+  // Diz ao swagger-jsdoc para ler os ficheiros .ts (com comentários)
+  apis: apiPaths,
 };
 
-export const swaggerSpec = swaggerJsdoc(options);
+// Exportamos 'swaggerSpec' como export default para simplificar a importação
+const swaggerSpec = swaggerJSDoc(options);
+export default swaggerSpec;
