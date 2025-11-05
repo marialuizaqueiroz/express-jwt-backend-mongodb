@@ -7,32 +7,31 @@ import authRouter from "./routes/auth.router.js";
 import taskRoutes from "./routes/task.router.js";
 import logger from "./utils/logger.js";
 
-// Swagger
 import swaggerUi from "swagger-ui-express";
-import { swaggerSpec } from "./config/swagger.config.js"; // já vem configurado
+import { swaggerSpec } from "./config/swagger.config.js";
 
 const app = express();
 
-// Middlewares globais
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// Swagger Docs
-app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
-
-// Rota raiz simples
+// Rota principal
 app.get("/", (req, res) => {
-  res.send("API online 🚀");
+  res.send("<h3>API online 🚀</h3>");
 });
 
-// Rotas principais
+// Rotas
 app.use("/api", authRouter);
 app.use("/api/tasks", taskRoutes);
+
+// Swagger UI
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
 
 // Middleware de erro
 app.use(errorMiddleware);
 
-// Conexão com o banco e inicialização
+// Inicialização do servidor
 try {
   logger.info("🔍 Tentando conectar ao MongoDB...");
 
@@ -43,12 +42,12 @@ try {
 
   logger.info("✅ Conexão com MongoDB estabelecida!");
 
-  // Só inicia o servidor localmente (Vercel gerencia em produção)
   if (!process.env.VERCEL_ENV) {
     const port = config.port || 3000;
-    app.listen(port, () => logger.info(`🚀 Servidor rodando na porta ${port}`));
+    app.listen(port, () =>
+      logger.info(`🚀 Servidor local rodando na porta ${port}`)
+    );
   }
-
 } catch (error: any) {
   logger.error("❌ Falha ao iniciar:", error.message || error);
   process.exit(1);

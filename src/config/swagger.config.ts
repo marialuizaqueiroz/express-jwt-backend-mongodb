@@ -64,14 +64,13 @@ const options = {
         description: "Servidor Local",
       },
       {
-        url: "https://seu-nome-do-projeto.vercel.app/api",
+        url: "https://express-jwt-backend-mongodb-ey8j5wd0b.vercel.app/api",
         description: "Servidor em Produção (Vercel)",
       },
     ],
   },
-  apis: ["./src/routes/*.ts"], // Caminho dos arquivos de rotas
+apis: process.env.VERCEL ? ["./dist/routes/*.js"] : ["./src/routes/*.ts"],
 };
 
 export const swaggerSpec = swaggerJSDoc(options);
-
 
