@@ -1,17 +1,15 @@
 import swaggerJSDoc from 'swagger-jsdoc';
 import path from 'path';
-import { fileURLToPath } from 'url'; // Para __dirname em ESM
+import { fileURLToPath } from 'url';
 
-// Esta é a forma correta em ESM de obter o __dirname
-// __filename aponta para .../dist/config/swagger.config.js (após compilação)
 const __filename = fileURLToPath(import.meta.url);
-// __dirname aponta para a pasta .../dist/config
+// __dirname aponta para .../dist/config/ (após compilação)
 const __dirname = path.dirname(__filename);
 
-// Construímos o caminho para a pasta 'routes' compilada
-// .../dist/config -> ../ -> .../dist -> /routes -> .../dist/routes
+// MUDANÇA-CHAVE: Vamos procurar os ficheiros .ts originais na pasta 'src'
+// .../dist/config/ -> ../../ -> src/routes/*.ts
 const apiPaths = [
-  path.join(__dirname, '../routes/*.js'), // <--- MUDANÇA-CHAVE
+  path.join(__dirname, '../../src/routes/*.ts'), // <--- A CORREÇÃO
 ];
 
 const options: swaggerJSDoc.Options = {
@@ -26,7 +24,7 @@ const options: swaggerJSDoc.Options = {
     servers: [
       { url: 'http://localhost:3000/api', description: 'Servidor Local' },
       {
-        url: 'https://express-jwt-backend.vercel.app/api',
+        url: 'https://express-jwt-backend-mongodb-bhsl247zn.vercel.app/api',
         description: 'Servidor Produção (Vercel)',
       },
     ],
@@ -40,10 +38,8 @@ const options: swaggerJSDoc.Options = {
         },
       },
     },
-    // NOTA: A segurança foi movida para dentro dos ficheiros de rota
-    // para ser aplicada individualmente (rotas públicas vs. privadas)
   },
-  // Diz ao swagger-jsdoc para ler os ficheiros .js compilados
+  // Diz ao swagger-jsdoc para ler os ficheiros .ts originais
   apis: apiPaths,
 };
 
