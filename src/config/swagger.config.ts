@@ -47,7 +47,10 @@
 
 // export default specs;
 
+// src/config/swagger.config.ts
 import swaggerJSDoc from "swagger-jsdoc";
+
+const isVercel = Boolean(process.env.VERCEL);
 
 const options = {
   definition: {
@@ -64,12 +67,13 @@ const options = {
         description: "Servidor Local",
       },
       {
-        url: "https://express-jwt-backend-mongodb-ey8j5wd0b.vercel.app/api",
-        description: "Servidor em Produção (Vercel)",
+        url: `https://${process.env.VERCEL_URL ?? "express-jwt-backend.vercel.app"}/api`,
+        description: "Servidor Produção (Vercel)",
       },
     ],
   },
-apis: process.env.VERCEL ? ["./dist/routes/*.js"] : ["./src/routes/*.ts"],
+  // inclui ambos: TS no dev e JS no dist (para produção)
+  apis: isVercel ? ["./dist/routes/*.js"] : ["./src/routes/*.ts", "./src/controllers/*.ts"],
 };
 
 export const swaggerSpec = swaggerJSDoc(options);

@@ -1,3 +1,4 @@
+// src/app.ts
 import express from "express";
 import cors from "cors";
 import config from "./config/index.js";
@@ -8,30 +9,41 @@ import taskRoutes from "./routes/task.router.js";
 import logger from "./utils/logger.js";
 
 import swaggerUi from "swagger-ui-express";
-import { swaggerSpec } from "./config/swagger.config.js";
+import { swaggerSpec } from "./config/swagger.config.js"; // IMPORT COM .js (NodeNext)
 
+// ----- app -----
 const app = express();
 
-// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// Rota principal
-app.get("/", (req, res) => {
-  res.send("<h3>API online 🚀</h3>");
+// rota raiz simples
+app.get("/", (_req, res) => {
+  res.send("API online 🚀");
 });
 
-// Rotas
+// expõe o JSON da spec explicitamente (útil para ambientes serverless)
+app.get("/api/swagger.json", (_req, res) => {
+  res.setHeader("Content-Type", "application/json");
+  res.send(swaggerSpec);
+});
+
+// Swagger UI apontando para o JSON acima (evita problemas de fetch em serverless)
+app.use(
+  "/api/docs",
+  swaggerUi.serve,
+  // usamos setup com swaggerUrl via swaggerOptions para garantir que o cliente carregue o JSON certo
+  swaggerUi.setup(undefined, { explorer: true, swaggerOptions: { url: "/api/swagger.json" } })
+);
+
+// rotas da API
 app.use("/api", authRouter);
 app.use("/api/tasks", taskRoutes);
 
-// Swagger UI
-app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
-
-// Middleware de erro
+// middleware de erro deve ficar por último
 app.use(errorMiddleware);
 
-// Inicialização do servidor
+// Inicialização / conexão com MongoDB
 try {
   logger.info("🔍 Tentando conectar ao MongoDB...");
 
@@ -44,9 +56,7 @@ try {
 
   if (!process.env.VERCEL_ENV) {
     const port = config.port || 3000;
-    app.listen(port, () =>
-      logger.info(`🚀 Servidor local rodando na porta ${port}`)
-    );
+    app.listen(port, () => logger.info(`🚀 Servidor local rodando na porta ${port}`));
   }
 } catch (error: any) {
   logger.error("❌ Falha ao iniciar:", error.message || error);
