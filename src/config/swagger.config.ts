@@ -46,28 +46,42 @@
 // const specs = swaggerJsdoc(options);
 
 // export default specs;
-import swaggerJSDoc from "swagger-jsdoc";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import swaggerJsdoc from "swagger-jsdoc";
 
 const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "API - CRUD de Usuários e Tarefas",
+      title: "API CRUD de Tarefas",
       version: "1.0.0",
-      description:
-        "Documentação da API do projeto com autenticação e tarefas. Projeto desenvolvido em Node.js + Express + TypeScript.",
+      description: "Documentação da API CRUD de Tarefas com autenticação JWT",
     },
     servers: [
-      { url: "http://localhost:3000/api", description: "Servidor Local" },
-      { url: "https://express-jwt-backend.vercel.app/api", description: "Servidor em Produção (Vercel)" }
+      {
+        url: "https://express-jwt-backend.vercel.app", // URL de produção no Vercel
+        description: "Servidor de produção",
+      },
+      {
+        url: "http://localhost:3000",
+        description: "Servidor local",
+      },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
     ],
   },
-  apis: [path.join(__dirname, "../routes/*.js")],
+  apis: ["./src/routes/*.ts"], // caminho dos arquivos com as anotações Swagger
 };
 
-export const swaggerSpec = swaggerJSDoc(options);
+export const swaggerSpec = swaggerJsdoc(options);

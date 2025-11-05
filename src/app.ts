@@ -6,52 +6,35 @@ import { errorMiddleware } from "./middlewares/error.middleware.js";
 import authRouter from "./routes/auth.router.js";
 import taskRoutes from "./routes/task.router.js";
 import logger from "./utils/logger.js";
-
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger.config.js";
-import { fileURLToPath } from "url";
-import path from "path";
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// ✅ Servir arquivos estáticos do Swagger manualmente (correção para Vercel)
-app.use(
-  "/api/docs",
-  express.static(path.join(__dirname, "../node_modules/swagger-ui-dist")),
-  swaggerUi.serve,
-  swaggerUi.setup(swaggerSpec, { explorer: true })
-);
+// Documentação Swagger
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
 
-app.get("/", (req, res) => {
-  res.send("API online 🚀");
-});
-
+// Rotas
+app.get("/", (req, res) => res.send("API online 🚀"));
 app.use("/api", authRouter);
 app.use("/api/tasks", taskRoutes);
-
 app.use(errorMiddleware);
 
+// Conexão com MongoDB
 try {
   logger.info("🔍 Tentando conectar ao MongoDB...");
-
   await connectDB({
     serverSelectionTimeoutMS: 30000,
     socketTimeoutMS: 45000,
   });
-
   logger.info("✅ Conexão com MongoDB estabelecida!");
 
   if (!process.env.VERCEL_ENV) {
     const port = config.port || 3000;
-    app.listen(port, () =>
-      logger.info(`🚀 Servidor local rodando na porta ${port}`)
-    );
+    app.listen(port, () => logger.info(`🚀 Servidor local rodando na porta ${port}`));
   }
 } catch (error: any) {
   logger.error("❌ Falha ao iniciar:", error.message || error);
