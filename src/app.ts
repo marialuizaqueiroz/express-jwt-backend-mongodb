@@ -14,16 +14,14 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Documentação Swagger
+// Rota Swagger (deve vir antes das rotas normais)
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
 
-// Rotas
 app.get("/", (req, res) => res.send("API online 🚀"));
 app.use("/api", authRouter);
 app.use("/api/tasks", taskRoutes);
 app.use(errorMiddleware);
 
-// Conexão com MongoDB
 try {
   logger.info("🔍 Tentando conectar ao MongoDB...");
   await connectDB({
