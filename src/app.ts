@@ -15,7 +15,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// 🟢 Documentação Swagger correta:
+// 🟢 Configuração do Swagger corrigida para Vercel
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
 
 app.get("/", (req, res) => {
