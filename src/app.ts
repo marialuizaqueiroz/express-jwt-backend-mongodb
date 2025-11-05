@@ -1,47 +1,57 @@
 import express from "express";
-import cors from 'cors';
-import config from "./config/index.js"; 
+import cors from "cors";
+import config from "./config/index.js";
 import { connectDB } from "./database/index.js";
 import { errorMiddleware } from "./middlewares/error.middleware.js";
 import authRouter from "./routes/auth.router.js";
-import taskRoutes from "./routes/task.router.js"; 
+import taskRoutes from "./routes/task.router.js";
 import logger from "./utils/logger.js";
 
+// Swagger
 import swaggerUi from "swagger-ui-express";
-import { swaggerSpec } from "./config/swagger.config.js";
+import { swaggerSpec } from "./config/swagger.config.js"; // já vem configurado
 
 const app = express();
+
+// Middlewares globais
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
+// Swagger Docs
+app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
 
+// Rota raiz simples
+app.get("/", (req, res) => {
+  res.send("API online 🚀");
+});
+
+// Rotas principais
 app.use("/api", authRouter);
-app.use("/api/tasks", taskRoutes); 
+app.use("/api/tasks", taskRoutes);
 
+// Middleware de erro
 app.use(errorMiddleware);
 
+// Conexão com o banco e inicialização
 try {
   logger.info("🔍 Tentando conectar ao MongoDB...");
-  
+
   await connectDB({
-    serverSelectionTimeoutMS: 30000, 
-    socketTimeoutMS: 45000, 
+    serverSelectionTimeoutMS: 30000,
+    socketTimeoutMS: 45000,
   });
-  
+
   logger.info("✅ Conexão com MongoDB estabelecida!");
 
-
+  // Só inicia o servidor localmente (Vercel gerencia em produção)
   if (!process.env.VERCEL_ENV) {
-    const port = config.port || 3000; 
-    app.listen(port, () =>
-      logger.info(`🚀 Servidor local rodando na porta ${port}`)
-    );
+    const port = config.port || 3000;
+    app.listen(port, () => logger.info(`🚀 Servidor rodando na porta ${port}`));
   }
 
 } catch (error: any) {
   logger.error("❌ Falha ao iniciar:", error.message || error);
-  process.exit(1); 
+  process.exit(1);
 }
 
 export default app;
