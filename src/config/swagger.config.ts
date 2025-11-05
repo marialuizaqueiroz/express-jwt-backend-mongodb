@@ -1,10 +1,17 @@
 import swaggerJSDoc from 'swagger-jsdoc';
 import path from 'path';
+import { fileURLToPath } from 'url'; // Para __dirname em ESM
 
-// O 'path.resolve' garante que o caminho é absoluto a partir da raiz do projeto
+// Esta é a forma correta em ESM de obter o __dirname
+// __filename aponta para .../dist/config/swagger.config.js (após compilação)
+const __filename = fileURLToPath(import.meta.url);
+// __dirname aponta para a pasta .../dist/config
+const __dirname = path.dirname(__filename);
+
+// Construímos o caminho para a pasta 'routes' compilada
+// .../dist/config -> ../ -> .../dist -> /routes -> .../dist/routes
 const apiPaths = [
-  path.resolve(process.cwd(), './src/routes/auth.router.ts'),
-  path.resolve(process.cwd(), './src/routes/task.router.ts'),
+  path.join(__dirname, '../routes/*.js'), // <--- MUDANÇA-CHAVE
 ];
 
 const options: swaggerJSDoc.Options = {
@@ -23,7 +30,6 @@ const options: swaggerJSDoc.Options = {
         description: 'Servidor Produção (Vercel)',
       },
     ],
-    // A segurança (cadeado) é definida aqui
     components: {
       securitySchemes: {
         bearerAuth: {
@@ -34,16 +40,12 @@ const options: swaggerJSDoc.Options = {
         },
       },
     },
-    security: [
-      {
-        bearerAuth: [], // Aplica 'bearerAuth' globalmente a todas as rotas
-      },
-    ],
+    // NOTA: A segurança foi movida para dentro dos ficheiros de rota
+    // para ser aplicada individualmente (rotas públicas vs. privadas)
   },
-  // Diz ao swagger-jsdoc para ler os ficheiros .ts (com comentários)
+  // Diz ao swagger-jsdoc para ler os ficheiros .js compilados
   apis: apiPaths,
 };
 
-// Exportamos 'swaggerSpec' como export default para simplificar a importação
 const swaggerSpec = swaggerJSDoc(options);
 export default swaggerSpec;
