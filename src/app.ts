@@ -9,14 +9,24 @@ import logger from "./utils/logger.js";
 
 import swaggerUi from "swagger-ui-express";
 import { swaggerSpec } from "./config/swagger.config.js";
+import { fileURLToPath } from "url";
+import path from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-// 🟢 Configuração do Swagger corrigida para Vercel
-app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
+// ✅ Servir arquivos estáticos do Swagger manualmente (correção para Vercel)
+app.use(
+  "/api/docs",
+  express.static(path.join(__dirname, "../node_modules/swagger-ui-dist")),
+  swaggerUi.serve,
+  swaggerUi.setup(swaggerSpec, { explorer: true })
+);
 
 app.get("/", (req, res) => {
   res.send("API online 🚀");
