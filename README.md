@@ -68,3 +68,15 @@ Um ficheiro `requests.yaml` para ser importado no Insomnia está disponível na 
 ## Variáveis de Ambiente
 
 Para rodar este projeto localmente, é necessário criar um arquivo `.env` na raiz com as seguintes variáveis:
+PORT
+MONGO_URI
+JWT_SECRET
+JWT_EXPIRES_IN
+NODE_ENV
+
+## 📘 Documentação Swagger
+
+A documentação da API está disponível em:
+
+- **Local:** [http://localhost:3000/docs](http://localhost:3000/docs)
+- **Produção (Vercel):** [https://express-jwt-backend.vercel.app/docs](https://express-jwt-backend.vercel.app/docs)
