@@ -47,10 +47,12 @@
 
 // export default specs;
 
-// src/config/swagger.config.ts
 import swaggerJSDoc from "swagger-jsdoc";
+import path from "path";
+import { fileURLToPath } from "url";
 
-const isVercel = Boolean(process.env.VERCEL);
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const options = {
   definition: {
@@ -59,7 +61,7 @@ const options = {
       title: "API - CRUD de Usuários e Tarefas",
       version: "1.0.0",
       description:
-        "Documentação da API do projeto com autenticação e tarefas. Projeto desenvolvido em Node.js + Express + TypeScript.",
+        "Documentação da API com autenticação e tarefas. Projeto desenvolvido em Node.js + Express + TypeScript.",
     },
     servers: [
       {
@@ -67,13 +69,12 @@ const options = {
         description: "Servidor Local",
       },
       {
-        url: `https://${process.env.VERCEL_URL ?? "express-jwt-backend.vercel.app"}/api`,
-        description: "Servidor Produção (Vercel)",
+        url: "https://express-jwt-backend.vercel.app/api",
+        description: "Servidor em Produção (Vercel)",
       },
     ],
   },
-  // inclui ambos: TS no dev e JS no dist (para produção)
-  apis: isVercel ? ["./dist/routes/*.js"] : ["./src/routes/*.ts", "./src/controllers/*.ts"],
+  apis: [path.join(__dirname, "../routes/*.js")], // funciona no build do Vercel
 };
 
 export const swaggerSpec = swaggerJSDoc(options);
