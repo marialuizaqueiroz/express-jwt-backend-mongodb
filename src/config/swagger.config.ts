@@ -2,15 +2,9 @@ import swaggerJSDoc from 'swagger-jsdoc';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+// Corrigir caminho absoluto de forma segura para ESModules:
 const __filename = fileURLToPath(import.meta.url);
-// __dirname aponta para .../dist/config/ (após compilação)
 const __dirname = path.dirname(__filename);
-
-// MUDANÇA-CHAVE: Vamos procurar os ficheiros .ts originais na pasta 'src'
-// .../dist/config/ -> ../../ -> src/routes/*.ts
-const apiPaths = [
-  path.join(__dirname, '../../src/routes/*.ts'), // <--- A CORREÇÃO
-];
 
 const options: swaggerJSDoc.Options = {
   definition: {
@@ -24,7 +18,7 @@ const options: swaggerJSDoc.Options = {
     servers: [
       { url: 'http://localhost:3000/api', description: 'Servidor Local' },
       {
-        url: 'https://express-jwt-backend-mongodb-bhsl247zn.vercel.app/api',
+        url: 'https://express-jwt-backend-mongodb.marialuiza.me/api',
         description: 'Servidor Produção (Vercel)',
       },
     ],
@@ -34,13 +28,15 @@ const options: swaggerJSDoc.Options = {
           type: 'http',
           scheme: 'bearer',
           bearerFormat: 'JWT',
-          description: 'Token JWT de autenticação obtido no login',
+          description: 'Token JWT obtido após login',
         },
       },
     },
+    security: [{ bearerAuth: [] }],
   },
-  // Diz ao swagger-jsdoc para ler os ficheiros .ts originais
-  apis: apiPaths,
+
+  // ⚠️ IMPORTANTE: usar os arquivos JS da build (dist)
+  apis: [path.join(__dirname, '../../dist/routes/*.js')],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
